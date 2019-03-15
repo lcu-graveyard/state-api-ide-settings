@@ -17,20 +17,20 @@ namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class DeleteActivityRequest
+    public class SetEditSectionRequest
     {
         [DataMember]
-        public virtual string Activity { get; set; }
+        public virtual string Section { get; set; }
     }
 
-    public static class DeleteActivity
+    public static class SetEditSection
     {
-        [FunctionName("DeleteActivity")]
+        [FunctionName("SetEditSection")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.WithState<SetEditSectionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
                 var regGraphConfig = new LCUGraphConfig()
                 {
@@ -42,9 +42,10 @@ namespace LCU.State.API.IDESettings
 
                 var ideGraph = new IDEGraph(regGraphConfig);
 
-               await ideGraph.DeleteActivity(reqData.Activity, details.EnterpriseAPIKey, "Default");
+                state.EditSection = state.SideBarSections?.FirstOrDefault(sec => sec == reqData.Section);
 
-                state.Activities = state.Activities.Where(a => a.Lookup != reqData.Activity).ToList();
+                if (!state.EditSection.IsNullOrEmpty())
+                    state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, "Default");
 
                 return state;
             });

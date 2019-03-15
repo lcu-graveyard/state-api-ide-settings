@@ -7,9 +7,9 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Runtime.Serialization;
 using LCU.State.API.IdeSettings.Models;
 using System.Linq;
+using System.Runtime.Serialization;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
 
@@ -17,20 +17,20 @@ namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class DeleteActivityRequest
+    public class SetSideBarEditActivityRequest
     {
         [DataMember]
         public virtual string Activity { get; set; }
     }
 
-    public static class DeleteActivity
+    public static class SetSideBarEditActivity
     {
-        [FunctionName("DeleteActivity")]
+        [FunctionName("SetSideBarEditActivity")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.WithState<SetSideBarEditActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
                 var regGraphConfig = new LCUGraphConfig()
                 {
@@ -42,9 +42,9 @@ namespace LCU.State.API.IDESettings
 
                 var ideGraph = new IDEGraph(regGraphConfig);
 
-               await ideGraph.DeleteActivity(reqData.Activity, details.EnterpriseAPIKey, "Default");
+                state.SideBarEditActivity = reqData.Activity;
 
-                state.Activities = state.Activities.Where(a => a.Lookup != reqData.Activity).ToList();
+                state.SideBarSections = await ideGraph.ListSideBarSections(state.SideBarEditActivity, details.EnterpriseAPIKey, "Default");
 
                 return state;
             });

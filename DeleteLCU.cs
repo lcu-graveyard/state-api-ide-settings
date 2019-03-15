@@ -9,28 +9,28 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using LCU.State.API.IdeSettings.Models;
-using System.Linq;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using System.Linq;
 
 namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class DeleteActivityRequest
+    public class DeleteLCURequest
     {
         [DataMember]
-        public virtual string Activity { get; set; }
+        public virtual string LCU { get; set; }
     }
 
-    public static class DeleteActivity
+    public static class DeleteLCU
     {
-        [FunctionName("DeleteActivity")]
+        [FunctionName("DeleteLCU")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.WithState<DeleteLCURequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
                 var regGraphConfig = new LCUGraphConfig()
                 {
@@ -42,9 +42,11 @@ namespace LCU.State.API.IDESettings
 
                 var ideGraph = new IDEGraph(regGraphConfig);
 
-               await ideGraph.DeleteActivity(reqData.Activity, details.EnterpriseAPIKey, "Default");
+                await ideGraph.DeleteLCU(reqData.LCU, details.EnterpriseAPIKey, "Default");
 
-                state.Activities = state.Activities.Where(a => a.Lookup != reqData.Activity).ToList();
+                state.Arch.LCUs = await ideGraph.ListLCUs(details.EnterpriseAPIKey, "Default");
+
+                //  TODO:  Need to delete other assets related to the LCU...  created apps, delete from filesystem, cleanup state??  Or what do we want to do with that stuff?
 
                 return state;
             });

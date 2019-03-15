@@ -8,31 +8,30 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.Graphs.Registry.Enterprises.IDE;
 using LCU.State.API.IdeSettings.Models;
-using System.Linq;
 using LCU.Graphs;
+using LCU.Graphs.Registry.Enterprises.IDE;
 
 namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class SaveActivityRequest
+    public class SaveSectionActionRequest
     {
         [DataMember]
-        public virtual IDEActivity Activity { get; set; }
+        public virtual IdeSettingsSectionAction Action { get; set; }
     }
 
-    public static class SaveActivity
+    public static class SaveSectionAction
     {
-        [FunctionName("SaveActivity")]
+        [FunctionName("SaveSectionAction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<SaveActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.WithState<SaveSectionActionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
-                if (!reqData.Activity.Title.IsNullOrEmpty() && !reqData.Activity.Lookup.IsNullOrEmpty() && !reqData.Activity.Icon.IsNullOrEmpty())
+                if (!reqData.Action.Action.IsNullOrEmpty() && !reqData.Action.Name.IsNullOrEmpty())
                 {
                     var regGraphConfig = new LCUGraphConfig()
                     {
@@ -44,24 +43,13 @@ namespace LCU.State.API.IDESettings
 
                     var ideGraph = new IDEGraph(regGraphConfig);
 
-					var settings = new IDEContainerSettings()
-                    {
-                        Container = "Default",
-                        EnterprisePrimaryAPIKey = details.EnterpriseAPIKey
-                    };
+                    var secAct = await ideGraph.SaveSectionAction(state.SideBarEditActivity, state.EditSection, reqData.Action, details.EnterpriseAPIKey, "Default");
 
-                    var ideSettings = await ideGraph.EnsureIDESettings(settings);
+                    state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, "Default");
 
-                    var activity = await ideGraph.SaveActivity(reqData.Activity, details.EnterpriseAPIKey, settings.Container);
+                    state.EditSectionAction = null;
 
-                    state.Activities = await ideGraph.ListActivities(details.EnterpriseAPIKey, settings.Container);
-
-                    state.EditActivity = null;
-
-                    if (state.AddNew == null)
-                        state.AddNew = new IdeSettingsAddNew();
-
-                    state.AddNew.Activity = false;
+                    state.AddNew.SectionAction = false;
                 }
 
                 return state;

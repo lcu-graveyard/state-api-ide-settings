@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using LCU.State.API.IdeSettings.Models;
-using System.Linq;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
 
@@ -17,20 +16,23 @@ namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class DeleteActivityRequest
+    public class DeleteSectionActionRequest
     {
         [DataMember]
-        public virtual string Activity { get; set; }
+        public virtual string Action { get; set; }
+        
+        [DataMember]
+        public virtual string Group { get; set; }
     }
 
-    public static class DeleteActivity
+    public static class DeleteSectionAction
     {
-        [FunctionName("DeleteActivity")]
+        [FunctionName("DeleteSectionAction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.WithState<DeleteSectionActionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
                 var regGraphConfig = new LCUGraphConfig()
                 {
@@ -42,9 +44,9 @@ namespace LCU.State.API.IDESettings
 
                 var ideGraph = new IDEGraph(regGraphConfig);
 
-               await ideGraph.DeleteActivity(reqData.Activity, details.EnterpriseAPIKey, "Default");
+                await ideGraph.DeleteSectionAction(state.SideBarEditActivity, state.EditSection, reqData.Action, reqData.Group, details.EnterpriseAPIKey, "Default");
 
-                state.Activities = state.Activities.Where(a => a.Lookup != reqData.Activity).ToList();
+                state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, "Default");
 
                 return state;
             });

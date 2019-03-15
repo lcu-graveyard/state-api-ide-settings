@@ -32,6 +32,8 @@ namespace LCU.State.API.IDESettings
 			{
 				state.EditActivity = state.Activities?.FirstOrDefault(a => a.Lookup == reqData.Activity)?.Lookup;
 
+				state.AddNew.Activity = false;
+
 				return state;
 			});
 		}
