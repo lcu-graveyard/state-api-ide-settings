@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using LCU.State.API.IdeSettings.Models;
+using LCU.Graphs.Registry.Enterprises.IDE;
 
 namespace LCU.State.API.IDESettings
 {
