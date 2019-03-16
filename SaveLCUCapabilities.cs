@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using LCU.State.API.IdeSettings.Models;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using System.Linq;
 
 namespace LCU.State.API.IDESettings
 {
@@ -21,10 +22,10 @@ namespace LCU.State.API.IDESettings
     {
         [DataMember]
         public virtual List<string> Files { get; set; }
-        
+
         [DataMember]
         public virtual List<IdeSettingsConfigSolution> Solutions { get; set; }
-        
+
         [DataMember]
         public virtual string LCU { get; set; }
     }
@@ -53,8 +54,17 @@ namespace LCU.State.API.IDESettings
                     var status = await ideGraph.SaveLCUCapabilities(reqData.LCU, reqData.Files, reqData.Solutions, details.EnterpriseAPIKey, "Default");
 
                     state.Config.LCUFiles = await ideGraph.ListLCUFiles(reqData.LCU, details.Host, req.Scheme);
-                    
+
                     state.Config.LCUSolutions = await ideGraph.ListLCUSolutions(reqData.LCU, details.EnterpriseAPIKey, "Default");
+
+                    var lcus = await ideGraph.ListLCUs(details.EnterpriseAPIKey, "Default");
+
+                    state.LCUSolutionOptions = lcus?.ToDictionary(lcu => lcu.Lookup, lcu =>
+                    {
+                        var solutions = ideGraph.ListLCUSolutions(lcu.Lookup, details.EnterpriseAPIKey, "Default").Result;
+
+                        return solutions?.Select(sln => sln.Name)?.ToList();
+                    });
                 }
 
                 return state;
