@@ -93,7 +93,7 @@ namespace LCU.State.API.IDESettings
                 {
                     Name = lcu.Lookup,
                     PathRegex = $"/_lcu/{lcu.Lookup}*",
-                    Priority = apps == null ? 500 : apps.Select(a => a.Priority).Max() + 500,
+                    Priority = apps.IsNullOrEmpty() ? 500 : apps.Select(a => a.Priority).Max() + 500,
                     Hosts = new List<string>() { details.Host },
                     EnterprisePrimaryAPIKey = details.EnterpriseAPIKey
                 });
