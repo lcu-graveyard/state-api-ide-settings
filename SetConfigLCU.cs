@@ -50,10 +50,13 @@ namespace LCU.State.API.IDESettings
                     state.Config.LCUSolutions = await ideGraph.ListLCUSolutions(state.Config.ConfigLCU, details.EnterpriseAPIKey, "Default");
 
                     var client = new HttpClient();
-                    //  TODO:  This should hard code at https once that is enforced on the platform
-                    client.BaseAddress = new Uri($"http://{details.Host}");
 
-                    var lcuConfigResp = await client.GetAsync($"/_lcu/{state.Config.ConfigLCU}/lcu.json");
+                    //  TODO:  This should hard code at https once that is enforced on the platform
+                    var lcuJsonPath = $"http://{details.Host}/_lcu/{state.Config.ConfigLCU}/lcu.json";
+
+                    log.LogInformation($"Loading LCU.JSON from: {lcuJsonPath}");
+
+                    var lcuConfigResp = await client.GetAsync(lcuJsonPath);
 
                     var lcuConfigStr = await lcuConfigResp.Content.ReadAsStringAsync();
 
