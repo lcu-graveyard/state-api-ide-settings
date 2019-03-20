@@ -35,19 +35,13 @@ namespace LCU.State.API.IDESettings
         {
             return await req.WithState<SetConfigLCURequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
             {
-                var regGraphConfig = new LCUGraphConfig()
-                {
-                    APIKey = Environment.GetEnvironmentVariable("LCU_GRAPH_API_KEY"),
-                    Host = Environment.GetEnvironmentVariable("LCU_GRAPH_HOST"),
-                    Database = Environment.GetEnvironmentVariable("LCU_GRAPH_DATABASE"),
-                    Graph = Environment.GetEnvironmentVariable("LCU_GRAPH")
-                };
-
-                var ideGraph = new IDEGraph(regGraphConfig);
+                var ideGraph = req.LoadGraph<IDEGraph>();
 
                 state.Config.ConfigLCU = reqData.LCU;
 
                 var clearConfig = false;
+
+                log.LogInformation("Starting to set config LCU");
 
                 if (!state.Config.ConfigLCU.IsNullOrEmpty())
                 {
