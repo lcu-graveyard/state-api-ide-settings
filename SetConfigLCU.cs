@@ -54,13 +54,13 @@ namespace LCU.State.API.IDESettings
                     //  TODO:  This should hard code at https once that is enforced on the platform
                     var lcuJsonPath = $"http://{details.Host}/_lcu/{state.Config.ConfigLCU}/lcu.json";
 
-                    log.LogInformation($"Loading LCU.JSON from: {lcuJsonPath}");
+                    log.LogInformation($"Loading lcu.json from: {lcuJsonPath}");
 
                     var lcuConfigResp = await client.GetAsync(lcuJsonPath);
 
                     var lcuConfigStr = await lcuConfigResp.Content.ReadAsStringAsync();
 
-                    log.LogInformation($"LCU.JSON Loaded: {lcuConfigStr}");
+                    log.LogInformation($"lcu.json Loaded: {lcuConfigStr}");
 
                     if (lcuConfigResp.IsSuccessStatusCode && !lcuConfigStr.IsNullOrEmpty() && !lcuConfigStr.StartsWith("<"))
                     {
