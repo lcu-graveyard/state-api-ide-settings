@@ -57,6 +57,8 @@ namespace LCU.State.API.IDESettings
 
                     var lcuConfigStr = await lcuConfigResp.Content.ReadAsStringAsync();
 
+                    log.LogInformation($"LCU.JSON Loaded: {lcuConfigStr}");
+
                     if (lcuConfigResp.IsSuccessStatusCode && !lcuConfigStr.IsNullOrEmpty() && !lcuConfigStr.StartsWith("<"))
                     {
                         var lcuConfig = lcuConfigStr.FromJSON<dynamic>();
@@ -77,6 +79,8 @@ namespace LCU.State.API.IDESettings
 
                 if (clearConfig)
                 {
+                    log.LogInformation("Clearing LCU Config State");
+
                     state.Config.Files = new List<string>();
 
                     state.Config.LCUFiles = new List<string>();
