@@ -199,7 +199,7 @@ namespace LCU.Manager
 
         public virtual async Task<IdeSettingsState> LoadLCUFiles(string lcuLookup)
         {
-            state.Config.LCUFiles = await ideGraph.ListLCUFiles(lcuLookup, details.Host, "http");
+            state.Config.LCUFiles = await ideGraph.ListLCUFiles(lcuLookup, details.Host);
 
             return state;
         }
