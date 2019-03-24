@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -25,16 +25,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<ToggleAddNewActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<ToggleAddNewActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                if (state.AddNew == null)
-                    state.AddNew = new IdeSettingsAddNew();
-
-                state.AddNew.Activity = !state.AddNew.Activity;
-
-                state.EditActivity = null;
-
-                return state;
+                return await mgr.ToggleAddNew(AddNewTypes.Activity);
             });
         }
     }

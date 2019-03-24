@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using System.Linq;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -30,23 +30,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<DeleteActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                var regGraphConfig = new LCUGraphConfig()
-                {
-                    APIKey = Environment.GetEnvironmentVariable("LCU_GRAPH_API_KEY"),
-                    Host = Environment.GetEnvironmentVariable("LCU_GRAPH_HOST"),
-                    Database = Environment.GetEnvironmentVariable("LCU_GRAPH_DATABASE"),
-                    Graph = Environment.GetEnvironmentVariable("LCU_GRAPH")
-                };
-
-                var ideGraph = new IDEGraph(regGraphConfig);
-
-               await ideGraph.DeleteActivity(reqData.Activity, details.EnterpriseAPIKey, "Default");
-
-                state.Activities = state.Activities.Where(a => a.Lookup != reqData.Activity).ToList();
-
-                return state;
+                return await mgr.DeleteActivity(reqData.Activity);
             });
         }
     }

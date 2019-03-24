@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -29,30 +29,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<SaveSectionActionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<SaveSectionActionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                if (!reqData.Action.Action.IsNullOrEmpty() && !reqData.Action.Name.IsNullOrEmpty())
-                {
-                    var regGraphConfig = new LCUGraphConfig()
-                    {
-                        APIKey = Environment.GetEnvironmentVariable("LCU_GRAPH_API_KEY"),
-                        Host = Environment.GetEnvironmentVariable("LCU_GRAPH_HOST"),
-                        Database = Environment.GetEnvironmentVariable("LCU_GRAPH_DATABASE"),
-                        Graph = Environment.GetEnvironmentVariable("LCU_GRAPH")
-                    };
-
-                    var ideGraph = new IDEGraph(regGraphConfig);
-
-                    var secAct = await ideGraph.SaveSectionAction(state.SideBarEditActivity, state.EditSection, reqData.Action, details.EnterpriseAPIKey, "Default");
-
-                    state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, "Default");
-
-                    state.EditSectionAction = null;
-
-                    state.AddNew.SectionAction = false;
-                }
-
-                return state;
+                return await mgr.SaveSectionAction(reqData.Action);
             });
         }
     }

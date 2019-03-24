@@ -4,7 +4,6 @@ using Gremlin.Net.CosmosDb;
 using Gremlin.Net.Driver;
 using Gremlin.Net.Process.Traversal;
 using LCU.Graphs.Registry.Enterprises;
-using LCU.State.API.IdeSettings.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

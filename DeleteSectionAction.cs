@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -20,7 +20,7 @@ namespace LCU.State.API.IDESettings
     {
         [DataMember]
         public virtual string Action { get; set; }
-        
+
         [DataMember]
         public virtual string Group { get; set; }
     }
@@ -32,23 +32,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<DeleteSectionActionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<DeleteSectionActionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                var regGraphConfig = new LCUGraphConfig()
-                {
-                    APIKey = Environment.GetEnvironmentVariable("LCU_GRAPH_API_KEY"),
-                    Host = Environment.GetEnvironmentVariable("LCU_GRAPH_HOST"),
-                    Database = Environment.GetEnvironmentVariable("LCU_GRAPH_DATABASE"),
-                    Graph = Environment.GetEnvironmentVariable("LCU_GRAPH")
-                };
-
-                var ideGraph = new IDEGraph(regGraphConfig);
-
-                await ideGraph.DeleteSectionAction(state.SideBarEditActivity, state.EditSection, reqData.Action, reqData.Group, details.EnterpriseAPIKey, "Default");
-
-                state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, "Default");
-
-                return state;
+                return await mgr.DeleteSectionAction(reqData.Action, reqData.Group);
             });
         }
     }

@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using System.Collections.Generic;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -26,19 +26,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<ToggleAddNewLCURequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<ToggleAddNewLCURequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                if (state.AddNew == null)
-                    state.AddNew = new IdeSettingsAddNew();
-
-                if (state.Arch == null)
-                    state.Arch = new IdeSettingsArchitechture() { LCUs = new List<LowCodeUnitConfig>() };
-
-                state.AddNew.LCU = !state.AddNew.LCU;
-
-                state.Arch.EditLCU = null;
-
-                return state;
+                return await mgr.ToggleAddNew(AddNewTypes.LCU);
             });
         }
     }

@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using System.Linq;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -29,14 +29,10 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
 		{
-			return await req.WithState<SetEditActivityRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
-			{
-				state.EditActivity = state.Activities?.FirstOrDefault(a => a.Lookup == reqData.Activity)?.Lookup;
-
-				state.AddNew.Activity = false;
-
-				return state;
-			});
+            return await req.Manage<SetEditActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
+            {
+				return await mgr.SetEditActivity(reqData.Activity);
+            });
 		}
     }
 }

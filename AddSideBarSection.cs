@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.State.API.IdeSettings.Models;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Manager;
 
 namespace LCU.State.API.IDESettings
 {
@@ -18,9 +18,6 @@ namespace LCU.State.API.IDESettings
     [DataContract]
     public class AddSideBarSectionRequest
     {
-        [DataMember]
-        public virtual string Activity { get; set; }
-
         [DataMember]
         public virtual string Section { get; set; }
     }
@@ -32,23 +29,9 @@ namespace LCU.State.API.IDESettings
             [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.WithState<AddSideBarSectionRequest, IdeSettingsState>(log, async (details, reqData, state, stateMgr) =>
+            return await req.Manage<AddSideBarSectionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                var regGraphConfig = new LCUGraphConfig()
-                {
-                    APIKey = Environment.GetEnvironmentVariable("LCU_GRAPH_API_KEY"),
-                    Host = Environment.GetEnvironmentVariable("LCU_GRAPH_HOST"),
-                    Database = Environment.GetEnvironmentVariable("LCU_GRAPH_DATABASE"),
-                    Graph = Environment.GetEnvironmentVariable("LCU_GRAPH")
-                };
-
-                var ideGraph = new IDEGraph(regGraphConfig);
-
-                await ideGraph.AddSideBarSection(reqData.Activity, reqData.Section, details.EnterpriseAPIKey, "Default");
-
-                state.SideBarSections = await ideGraph.ListSideBarSections(state.SideBarEditActivity, details.EnterpriseAPIKey, "Default");
-
-                return state;
+                return await mgr.AddSideBarSection(reqData.Section);
             });
         }
     }
