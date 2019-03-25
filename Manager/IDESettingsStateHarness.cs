@@ -360,8 +360,6 @@ namespace LCU.Manager
 
             state.EditSectionAction = null;
 
-            state.EditSection = null;
-
             switch (type)
             {
                 case AddNewTypes.Activity:
@@ -370,6 +368,8 @@ namespace LCU.Manager
                     state.AddNew.LCU = false;
 
                     state.AddNew.SectionAction = false;
+
+                    state.EditSection = null;
                     break;
 
                 case AddNewTypes.LCU:
@@ -378,6 +378,8 @@ namespace LCU.Manager
                     state.AddNew.LCU = !state.AddNew.LCU;
 
                     state.AddNew.SectionAction = false;
+
+                    state.EditSection = null;
                     break;
 
                 case AddNewTypes.SectionAction:
@@ -394,6 +396,8 @@ namespace LCU.Manager
                     state.AddNew.LCU = false;
 
                     state.AddNew.SectionAction = false;
+
+                    state.EditSection = null;
                     break;
             }
 
