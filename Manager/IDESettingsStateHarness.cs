@@ -21,8 +21,6 @@ namespace LCU.Manager
         protected readonly string container;
 
         protected readonly IDEGraph ideGraph;
-
-        const string lcuPathRoot = "_lcu";
         #endregion
 
         #region Properties
@@ -399,63 +397,6 @@ namespace LCU.Manager
         #endregion
 
         #region Helpers
-        protected async Task<Status> ensureApplication(LowCodeUnitConfig lcu)
-        {
-            var apps = await appGraph.ListApplications(details.EnterpriseAPIKey);
-
-            var lcuApp = apps?.FirstOrDefault(a => a.PathRegex == $"/{lcuPathRoot}/{lcu.Lookup}*");
-
-            if (lcuApp == null)
-            {
-                lcuApp = await appGraph.Save(new Application()
-                {
-                    Name = lcu.Lookup,
-                    PathRegex = $"/{lcuPathRoot}/{lcu.Lookup}*",
-                    Priority = apps.IsNullOrEmpty() ? 500 : apps.Select(a => a.Priority).Max() + 500,
-                    Hosts = new List<string>() { details.Host },
-                    EnterprisePrimaryAPIKey = details.EnterpriseAPIKey
-                });
-            }
-
-            if (lcuApp != null)
-            {
-                var dafApps = await appGraph.GetDAFApplications(details.EnterpriseAPIKey, lcuApp.ID);
-
-                var dafApp = dafApps?.FirstOrDefault(a => a.Metadata["BaseHref"].ToString() == $"/{lcuPathRoot}/{lcu.Lookup}/");
-
-                if (dafApp == null)
-                    dafApp = new DAFViewConfiguration()
-                    {
-                        ApplicationID = lcuApp.ID,
-                        BaseHref = $"/{lcuPathRoot}/{lcu.Lookup}/",
-                        NPMPackage = lcu.NPMPackage,
-                        PackageVersion = lcu.PackageVersion,
-                        Priority = 10000
-                    }.JSONConvert<DAFApplicationConfiguration>();
-                else
-                {
-                    dafApp.Metadata["NPMPackage"] = lcu.NPMPackage;
-
-                    dafApp.Metadata["PackageVersion"] = lcu.PackageVersion;
-                }
-
-                var view = dafApp.JSONConvert<DAFViewConfiguration>();
-
-                var status = await unpackView(view, details.EnterpriseAPIKey);
-
-                if (status)
-                {
-                    dafApp = appGraph.SaveDAFApplication(details.EnterpriseAPIKey, view.JSONConvert<DAFApplicationConfiguration>()).Result;
-
-                    if (dafApp != null)
-                        lcu.PackageVersion = dafApp.Metadata["PackageVersion"].ToString();
-                }
-                else
-                    return status;
-            }
-
-            return Status.Success;
-        }
         #endregion
     }
 
