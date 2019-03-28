@@ -18,11 +18,7 @@ namespace LCU.Manager
     public class IDESettingsStateHarness : LCUStateHarness<IdeSettingsState>
     {
         #region Fields
-        protected readonly ApplicationGraph appGraph;
-
         protected readonly string container;
-
-        protected readonly EnterpriseGraph entGraph;
 
         protected readonly IDEGraph ideGraph;
 
@@ -36,11 +32,7 @@ namespace LCU.Manager
         public IDESettingsStateHarness(HttpRequest req, ILogger log, IdeSettingsState state)
             : base(req, log, state)
         {
-            appGraph = req.LoadGraph<ApplicationGraph>();
-
             this.container = "Default";
-
-            entGraph = req.LoadGraph<EnterpriseGraph>();
 
             ideGraph = req.LoadGraph<IDEGraph>();
         }
@@ -447,11 +439,13 @@ namespace LCU.Manager
                     dafApp.Metadata["PackageVersion"] = lcu.PackageVersion;
                 }
 
-                var status = await unpackView(dafApp, details.EnterpriseAPIKey);
+                var view = dafApp.JSONConvert<DAFViewConfiguration>();
+
+                var status = await unpackView(view, details.EnterpriseAPIKey);
 
                 if (status)
                 {
-                    dafApp = appGraph.SaveDAFApplication(details.EnterpriseAPIKey, dafApp).Result;
+                    dafApp = appGraph.SaveDAFApplication(details.EnterpriseAPIKey, view.JSONConvert<DAFApplicationConfiguration>()).Result;
 
                     if (dafApp != null)
                         lcu.PackageVersion = dafApp.Metadata["PackageVersion"].ToString();
@@ -461,39 +455,6 @@ namespace LCU.Manager
             }
 
             return Status.Success;
-        }
-
-        protected async Task<Status> unpackView(DAFApplicationConfiguration dafApp, string entApiKey)
-        {
-            var viewApp = dafApp.JSONConvert<DAFViewConfiguration>();
-
-            if (viewApp.PackageVersion != "dev-stream")
-            {
-                var ent = await entGraph.LoadByPrimaryAPIKey(entApiKey);
-
-                var client = new HttpClient();
-
-                var npmUnpackUrl = Environment.GetEnvironmentVariable("NPM_PUBLIC_URL");
-
-                var npmUnpackCode = Environment.GetEnvironmentVariable("NPM_PUBLIC_CODE");
-
-                var npmUnpack = $"{npmUnpackUrl}/api/npm-unpack?code={npmUnpackCode}&pkg={viewApp.NPMPackage}&version={viewApp.PackageVersion}";
-
-                npmUnpack += $"&applicationId={dafApp.ApplicationID}&enterpriseId={ent.ID}";
-
-                var response = await client.GetAsync(npmUnpack);
-
-                object statusObj = await response.Content.ReadAsJSONAsync<dynamic>();
-
-                var status = statusObj.JSONConvert<Status>();
-
-                if (status)
-                    dafApp.Metadata["PackageVersion"] = status.Metadata["Version"];
-
-                return status;
-            }
-            else
-                return Status.Success.Clone("Success", new { PackageVersion = viewApp.PackageVersion });
         }
         #endregion
     }
