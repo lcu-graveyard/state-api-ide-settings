@@ -32,7 +32,7 @@ namespace LCU.Manager
         {
             this.container = "Default";
 
-            ideGraph = req.LoadGraph<IDEGraph>();
+            ideGraph = req.LoadGraph<IDEGraph>(log);
         }
         #endregion
 
