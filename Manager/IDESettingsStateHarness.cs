@@ -109,7 +109,7 @@ namespace LCU.Manager
             var client = new HttpClient();
 
             //  TODO:  This should hard code at https once that is enforced on the platform
-            var lcuJsonPath = $"http://{details.Host}/_lcu/{lcuLookup}/lcu.json";
+            var lcuJsonPath = $"https://{details.Host}/_lcu/{lcuLookup}/lcu.json";
 
             log.LogInformation($"Loading lcu.json from: {lcuJsonPath}");
 
@@ -208,7 +208,6 @@ namespace LCU.Manager
                 state.SectionActions = await ideGraph.ListSectionActions(state.SideBarEditActivity, state.EditSection, details.EnterpriseAPIKey, container);
             else
                 state.SectionActions = new List<IdeSettingsSectionAction>();
-
             return state;
         }
 
@@ -240,8 +239,6 @@ namespace LCU.Manager
         {
             if (!lcu.Lookup.IsNullOrEmpty() && !lcu.NPMPackage.IsNullOrEmpty() && !lcu.PackageVersion.IsNullOrEmpty())
             {
-                // lcu = await ideGraph.SaveLCU(lcu, details.EnterpriseAPIKey, container);
-
                 var status = await ensureApplication(lcu);
 
                 lcu = await ideGraph.SaveLCU(lcu, details.EnterpriseAPIKey, container);
