@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Fathym;
+using Fathym.API;
 using Fathym.Design.Singleton;
 using LCU.Graphs.Registry.Enterprises;
 using LCU.Graphs.Registry.Enterprises.IDE;
@@ -107,17 +108,6 @@ namespace LCU.State.API.IDESettings.Harness
             return await LoadSideBarSections();
         }
 
-        public virtual async Task<IdeSettingsState> DeconstructLCUConfig(string lcuLookup)
-        {
-            var lcuConfig = await appMgr.LoadLCUConfig(lcuLookup, details.Host);
-
-            state.Config.LCUConfig = lcuConfig.Model;
-
-            state.Config.CurrentLCUConfig = lcuLookup;
-
-            return state;
-        }
-
         public virtual async Task<IdeSettingsState> Ensure()
         {
             await appDev.EnsureIDESettings(details.EnterpriseAPIKey);
@@ -156,7 +146,7 @@ namespace LCU.State.API.IDESettings.Harness
             {
                 var solutions = appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcu.Lookup).Result;
 
-                return solutions?.Model.Select(sln => sln.Name)?.ToList();
+                return solutions?.Model?.Select(sln => sln.Name)?.ToList() ?? new List<string>();
             });
 
             return state;
@@ -167,6 +157,14 @@ namespace LCU.State.API.IDESettings.Harness
             var lcuConfig = await appMgr.LoadLCUConfig(lcuLookup, details.Host);
 
             state.Config.LCUConfig = lcuConfig.Model;
+
+            state.Config.CurrentLCUConfig = lcuLookup;
+
+            var lcuSolutions = await appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcuLookup);
+
+            state.Config.ActiveFiles = state.Config.LCUConfig.Files;
+
+            state.Config.ActiveSolutions = lcuSolutions.Model;
 
             return state;
         }
@@ -232,7 +230,7 @@ namespace LCU.State.API.IDESettings.Harness
         {
             if (!lcuLookup.IsNullOrEmpty())
             {
-                var status = await appMgr.SaveLCUCapabilities(lcuConfig, details.EnterpriseAPIKey, lcuLookup);
+                var status = await appDev.SaveLCUCapabilities(lcuConfig, details.EnterpriseAPIKey, lcuLookup);
 
                 return await WhenAll(
                     LoadLCUs(),
@@ -270,7 +268,6 @@ namespace LCU.State.API.IDESettings.Harness
 
             if (!state.Config.CurrentLCUConfig.IsNullOrEmpty())
                 return await WhenAll(
-                    DeconstructLCUConfig(state.Config.CurrentLCUConfig),
                     LoadLCUConfig(state.Config.CurrentLCUConfig)
                 );
             else
@@ -374,6 +371,20 @@ namespace LCU.State.API.IDESettings.Harness
         #region Helpers
         #endregion
     }
+
+public static class Temp
+{
+    
+		public static async Task<BaseResponse> SaveLCUCapabilities(this ApplicationDeveloperClient appDev, LowCodeUnitConfiguration lcuConfig, string entApiKey,
+			string lcuLookup)
+		{
+			var response = await appDev.Post<LowCodeUnitConfiguration, BaseResponse>($"hosting/{entApiKey}/lcus/{lcuLookup}",
+				lcuConfig);
+
+			return response;
+		}
+
+}
 
     public enum AddNewTypes
     {
