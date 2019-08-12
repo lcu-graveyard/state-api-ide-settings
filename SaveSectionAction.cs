@@ -10,7 +10,8 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
-using LCU.Manager;
+using LCU.State.API.IDESettings.Harness;
+using LCU.State.API.IDESettings.Models;
 
 namespace LCU.State.API.IDESettings
 {
@@ -19,7 +20,7 @@ namespace LCU.State.API.IDESettings
     public class SaveSectionActionRequest
     {
         [DataMember]
-        public virtual IdeSettingsSectionAction Action { get; set; }
+        public virtual IDESideBarAction Action { get; set; }
     }
 
     public static class SaveSectionAction

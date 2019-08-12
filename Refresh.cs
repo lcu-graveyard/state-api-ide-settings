@@ -11,7 +11,8 @@ using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
 using System.Collections.Generic;
 using System.Linq;
-using LCU.Manager;
+using LCU.State.API.IDESettings.Harness;
+using LCU.State.API.IDESettings.Models;
 
 namespace LCU.State.API.IDESettings
 {

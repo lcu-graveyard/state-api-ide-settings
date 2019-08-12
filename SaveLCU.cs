@@ -16,7 +16,8 @@ using Fathym;
 using System.Linq;
 using System.Net.Http;
 using Gremlin.Net.Process.Traversal;
-using LCU.Manager;
+using LCU.State.API.IDESettings.Harness;
+using LCU.State.API.IDESettings.Models;
 
 namespace LCU.State.API.IDESettings
 {
@@ -25,7 +26,7 @@ namespace LCU.State.API.IDESettings
     public class SaveLCURequest
     {
         [DataMember]
-        public virtual LowCodeUnitConfig LCU { get; set; }
+        public virtual LowCodeUnitSetupConfig LCU { get; set; }
     }
 
     public static class SaveLCU

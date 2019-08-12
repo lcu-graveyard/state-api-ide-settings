@@ -10,7 +10,8 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
-using LCU.Manager;
+using LCU.State.API.IDESettings.Harness;
+using LCU.State.API.IDESettings.Models;
 
 namespace LCU.State.API.IDESettings
 {

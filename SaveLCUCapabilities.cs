@@ -12,7 +12,8 @@ using System.Collections.Generic;
 using LCU.Graphs;
 using LCU.Graphs.Registry.Enterprises.IDE;
 using System.Linq;
-using LCU.Manager;
+using LCU.State.API.IDESettings.Harness;
+using LCU.State.API.IDESettings.Models;
 
 namespace LCU.State.API.IDESettings
 {
@@ -21,13 +22,10 @@ namespace LCU.State.API.IDESettings
     public class SaveLCUCapabilitiesRequest
     {
         [DataMember]
-        public virtual List<string> Files { get; set; }
+        public virtual LowCodeUnitConfiguration LCUConfig { get; set; }
 
         [DataMember]
-        public virtual List<IdeSettingsConfigSolution> Solutions { get; set; }
-
-        [DataMember]
-        public virtual string LCU { get; set; }
+        public virtual string LCULookup { get; set; }
     }
 
     public static class SaveLCUCapabilities
@@ -39,7 +37,7 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SaveLCUCapabilitiesRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                return await mgr.SaveLCUCapabilities(reqData.LCU, reqData.Files, reqData.Solutions);
+                return await mgr.SaveLCUCapabilities(reqData.LCULookup, reqData.LCUConfig);
             });
         }
     }
