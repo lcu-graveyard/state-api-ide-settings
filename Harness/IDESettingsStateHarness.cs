@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 using Fathym;
 using Fathym.API;
 using Fathym.Design.Singleton;
-using LCU.Graphs.Registry.Enterprises;
-using LCU.Graphs.Registry.Enterprises.IDE;
-using LCU.Presentation.Personas.Applications;
-using LCU.Runtime;
+using LCU.Personas.Client.Applications;
+using LCU.StateAPI;
 using LCU.State.API.IDESettings.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using LCU.Graphs.Registry.Enterprises.IDE;
 
 namespace LCU.State.API.IDESettings.Harness
 {
