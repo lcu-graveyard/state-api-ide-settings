@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Graphs.Registry.Enterprises.DataFlows;
 
 namespace LCU.State.API.IDESettings.Harness
 {
@@ -48,6 +49,8 @@ namespace LCU.State.API.IDESettings.Harness
             state.Config.LCUConfig = new LowCodeUnitConfiguration();
 
             state.Config.ActiveFiles = new List<string>();
+
+            state.Config.ActiveModules = new ModulePackSetup();
 
             state.Config.ActiveSolutions = new List<IdeSettingsConfigSolution>();
 
@@ -159,9 +162,13 @@ namespace LCU.State.API.IDESettings.Harness
 
             state.Config.CurrentLCUConfig = lcuLookup;
 
-            var lcuSolutions = await appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcuLookup);
-
             state.Config.ActiveFiles = state.Config.LCUConfig.Files;
+
+            var packSetup = await appMgr.GetModulePackSetup(details.EnterpriseAPIKey, lcuLookup);
+
+            state.Config.ActiveModules = packSetup.Model;
+
+            var lcuSolutions = await appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcuLookup);
 
             state.Config.ActiveSolutions = lcuSolutions.Model;
 
