@@ -35,6 +35,42 @@ namespace LCU.State.API.IDESettings.Harness
         #endregion
 
         #region API Methods
+        public virtual async Task<IdeSettingsState> AddDefaultDataAppsLCUs()
+        {
+            var nideConfigured = await appDev.ConfigureNapkinIDEForDataApps(details.EnterpriseAPIKey, details.Host);
+
+            if (nideConfigured.Status)
+            {
+                await LoadActivities();
+
+                await LoadSideBarSections();
+
+                await LoadSecionActions();
+
+                await LoadLCUs();
+            }
+
+            return state;
+        }
+        
+        public virtual async Task<IdeSettingsState> AddDefaultDataFlowLCUs()
+        {
+            var nideConfigured = await appDev.ConfigureNapkinIDEForDataFlows(details.EnterpriseAPIKey, details.Host);
+
+            if (nideConfigured.Status)
+            {
+                await LoadActivities();
+
+                await LoadSideBarSections();
+
+                await LoadSecionActions();
+
+                await LoadLCUs();
+            }
+
+            return state;
+        }
+
         public virtual async Task<IdeSettingsState> AddSideBarSection(string section)
         {
             await appDev.AddSideBarSection(section, details.EnterpriseAPIKey, state.SideBarEditActivity);
@@ -141,7 +177,7 @@ namespace LCU.State.API.IDESettings.Harness
         public virtual async Task<IdeSettingsState> LoadLCUs()
         {
             var lcus = await appMgr.ListLCUs(details.EnterpriseAPIKey);
-            
+
             state.Arch.LCUs = lcus.Model;
 
             state.LCUSolutionOptions = state.Arch.LCUs?.ToDictionary(lcu => lcu.Lookup, lcu =>
@@ -378,19 +414,19 @@ namespace LCU.State.API.IDESettings.Harness
         #endregion
     }
 
-public static class Temp
-{
-    
-		public static async Task<BaseResponse> SaveLCUCapabilities(this ApplicationDeveloperClient appDev, LowCodeUnitConfiguration lcuConfig, string entApiKey,
-			string lcuLookup)
-		{
-			var response = await appDev.Post<LowCodeUnitConfiguration, BaseResponse>($"hosting/{entApiKey}/lcus/{lcuLookup}",
-				lcuConfig);
+    public static class Temp
+    {
 
-			return response;
-		}
+        public static async Task<BaseResponse> SaveLCUCapabilities(this ApplicationDeveloperClient appDev, LowCodeUnitConfiguration lcuConfig, string entApiKey,
+            string lcuLookup)
+        {
+            var response = await appDev.Post<LowCodeUnitConfiguration, BaseResponse>($"hosting/{entApiKey}/lcus/{lcuLookup}",
+                lcuConfig);
 
-}
+            return response;
+        }
+
+    }
 
     public enum AddNewTypes
     {
