@@ -27,6 +27,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<AddDefaultDataAppsLCUsRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Added Default Data Apps LCUs.");
+
                 return await mgr.AddDefaultDataAppsLCUs();
             });
         }

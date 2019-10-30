@@ -27,6 +27,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<AddDefaultDataFlowLCUsRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Added Default Data Flow LCUs");
+
                 return await mgr.AddDefaultDataFlowLCUs();
             });
         }

@@ -36,6 +36,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SetConfigLCURequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Setting Config LCU: {reqData.LCU}");
+
                 return await mgr.SetConfigLCU(reqData.LCU);
             });
         }

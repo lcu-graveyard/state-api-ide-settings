@@ -28,6 +28,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<ToggleAddNewSectionActionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Toggling Add New Section Action.");
+
                 return await mgr.ToggleAddNew(AddNewTypes.SectionAction);
             });
         }

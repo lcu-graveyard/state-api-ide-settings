@@ -29,6 +29,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<ToggleAddNewLCURequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Toggling Add New LCU.");
+
                 return await mgr.ToggleAddNew(AddNewTypes.LCU);
             });
         }

@@ -32,6 +32,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<DeleteSideBarSectionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Deleting SideBar Section: {reqData.Section}");
+
                 return await mgr.DeleteSideBarSection(reqData.Section);
             });
         }
