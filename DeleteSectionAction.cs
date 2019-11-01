@@ -35,6 +35,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<DeleteSectionActionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Deleting Section Action: {reqData.Action} {reqData.Group}");
+
                 return await mgr.DeleteSectionAction(reqData.Action, reqData.Group);
             });
         }

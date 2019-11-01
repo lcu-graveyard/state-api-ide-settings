@@ -33,6 +33,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<DeleteActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Deleting Activity: {reqData.Activity}");
+
                 return await mgr.DeleteActivity(reqData.Activity);
             });
         }

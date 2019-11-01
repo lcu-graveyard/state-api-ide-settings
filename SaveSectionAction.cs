@@ -32,6 +32,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SaveSectionActionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Saving Section Action: {reqData.Action}");
+
                 return await mgr.SaveSectionAction(reqData.Action);
             });
         }

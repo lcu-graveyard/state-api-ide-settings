@@ -38,6 +38,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SaveLCURequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Saving LCU: {reqData.LCU}");
+
                 return await mgr.SaveLCU(reqData.LCU);
             });
         }

@@ -33,6 +33,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SaveActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Saving Activity: {reqData.Activity}");
+
                 return await mgr.SaveActivity(reqData.Activity);
             });
         }

@@ -32,6 +32,8 @@ namespace LCU.State.API.IDESettings
 		{
             return await req.Manage<SetEditActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+				log.LogInformation($"Setting Edit Activity: {reqData.Activity}");
+
 				return await mgr.SetEditActivity(reqData.Activity);
             });
 		}
