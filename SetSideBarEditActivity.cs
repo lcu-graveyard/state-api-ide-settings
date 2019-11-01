@@ -33,6 +33,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SetSideBarEditActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Setting SideBar Edit Activity: {reqData.Activity}");
+
                 return await mgr.SetSideBarEditActivity(reqData.Activity);
             });
         }

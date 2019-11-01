@@ -27,6 +27,8 @@ namespace LCU.State.API.IDESettings
             {
                 await mgr.Ensure();
 
+                log.LogInformation($"Refreshing.");
+
                 return await mgr.WhenAll(
                     mgr.LoadActivities(),
                     mgr.ConfigureSideBarEditActivity(),

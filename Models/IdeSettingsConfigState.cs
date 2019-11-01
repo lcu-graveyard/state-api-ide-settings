@@ -1,3 +1,4 @@
+using LCU.Graphs.Registry.Enterprises.DataFlows;
 using LCU.Graphs.Registry.Enterprises.IDE;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,9 @@ namespace LCU.State.API.IDESettings.Models
 	{
 		[DataMember]
 		public virtual List<string> ActiveFiles { get; set; }
+
+		[DataMember]
+		public virtual ModulePackSetup ActiveModules { get; set; }
 
 		[DataMember]
 		public virtual List<IdeSettingsConfigSolution> ActiveSolutions { get; set; }

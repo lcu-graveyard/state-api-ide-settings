@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Fathym;
 using Fathym.API;
 using Fathym.Design.Singleton;
-using LCU.Graphs.Registry.Enterprises;
-using LCU.Graphs.Registry.Enterprises.IDE;
-using LCU.Presentation.Personas.Applications;
-using LCU.Runtime;
+using LCU.Personas.Client.Applications;
+using LCU.StateAPI;
 using LCU.State.API.IDESettings.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using LCU.Graphs.Registry.Enterprises.IDE;
+using LCU.Graphs.Registry.Enterprises.DataFlows;
 
 namespace LCU.State.API.IDESettings.Harness
 {
@@ -35,6 +35,42 @@ namespace LCU.State.API.IDESettings.Harness
         #endregion
 
         #region API Methods
+        public virtual async Task<IdeSettingsState> AddDefaultDataAppsLCUs()
+        {
+            var nideConfigured = await appDev.ConfigureNapkinIDEForDataApps(details.EnterpriseAPIKey, details.Host);
+
+            if (nideConfigured.Status)
+            {
+                await LoadActivities();
+
+                await LoadSideBarSections();
+
+                await LoadSecionActions();
+
+                await LoadLCUs();
+            }
+
+            return state;
+        }
+        
+        public virtual async Task<IdeSettingsState> AddDefaultDataFlowLCUs()
+        {
+            var nideConfigured = await appDev.ConfigureNapkinIDEForDataFlows(details.EnterpriseAPIKey, details.Host);
+
+            if (nideConfigured.Status)
+            {
+                await LoadActivities();
+
+                await LoadSideBarSections();
+
+                await LoadSecionActions();
+
+                await LoadLCUs();
+            }
+
+            return state;
+        }
+
         public virtual async Task<IdeSettingsState> AddSideBarSection(string section)
         {
             await appDev.AddSideBarSection(section, details.EnterpriseAPIKey, state.SideBarEditActivity);
@@ -49,6 +85,8 @@ namespace LCU.State.API.IDESettings.Harness
             state.Config.LCUConfig = new LowCodeUnitConfiguration();
 
             state.Config.ActiveFiles = new List<string>();
+
+            state.Config.ActiveModules = new ModulePackSetup();
 
             state.Config.ActiveSolutions = new List<IdeSettingsConfigSolution>();
 
@@ -139,7 +177,7 @@ namespace LCU.State.API.IDESettings.Harness
         public virtual async Task<IdeSettingsState> LoadLCUs()
         {
             var lcus = await appMgr.ListLCUs(details.EnterpriseAPIKey);
-            
+
             state.Arch.LCUs = lcus.Model;
 
             state.LCUSolutionOptions = state.Arch.LCUs?.ToDictionary(lcu => lcu.Lookup, lcu =>
@@ -160,9 +198,13 @@ namespace LCU.State.API.IDESettings.Harness
 
             state.Config.CurrentLCUConfig = lcuLookup;
 
-            var lcuSolutions = await appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcuLookup);
-
             state.Config.ActiveFiles = state.Config.LCUConfig.Files;
+
+            var packSetup = await appMgr.GetModulePackSetup(details.EnterpriseAPIKey, lcuLookup);
+
+            state.Config.ActiveModules = packSetup.Model;
+
+            var lcuSolutions = await appMgr.ListLCUSolutions(details.EnterpriseAPIKey, lcuLookup);
 
             state.Config.ActiveSolutions = lcuSolutions.Model;
 
@@ -372,19 +414,19 @@ namespace LCU.State.API.IDESettings.Harness
         #endregion
     }
 
-public static class Temp
-{
-    
-		public static async Task<BaseResponse> SaveLCUCapabilities(this ApplicationDeveloperClient appDev, LowCodeUnitConfiguration lcuConfig, string entApiKey,
-			string lcuLookup)
-		{
-			var response = await appDev.Post<LowCodeUnitConfiguration, BaseResponse>($"hosting/{entApiKey}/lcus/{lcuLookup}",
-				lcuConfig);
+    public static class Temp
+    {
 
-			return response;
-		}
+        public static async Task<BaseResponse> SaveLCUCapabilities(this ApplicationDeveloperClient appDev, LowCodeUnitConfiguration lcuConfig, string entApiKey,
+            string lcuLookup)
+        {
+            var response = await appDev.Post<LowCodeUnitConfiguration, BaseResponse>($"hosting/{entApiKey}/lcus/{lcuLookup}",
+                lcuConfig);
 
-}
+            return response;
+        }
+
+    }
 
     public enum AddNewTypes
     {

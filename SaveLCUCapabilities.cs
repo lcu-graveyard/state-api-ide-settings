@@ -37,6 +37,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SaveLCUCapabilitiesRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Saving LCU Capabilities: {reqData.LCULookup} {reqData.LCUConfig}");
+
                 return await mgr.SaveLCUCapabilities(reqData.LCULookup, reqData.LCUConfig);
             });
         }

@@ -32,6 +32,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<AddSideBarSectionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Added SideBar Section: {reqData.Section}");
+
                 return await mgr.AddSideBarSection(reqData.Section);
             });
         }

@@ -8,29 +8,28 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using LCU.Graphs.Registry.Enterprises.IDE;
-using LCU.State.API.IDESettings.Harness;
 using LCU.State.API.IDESettings.Models;
+using LCU.State.API.IDESettings.Harness;
 
 namespace LCU.State.API.IDESettings
 {
     [Serializable]
     [DataContract]
-    public class ToggleAddNewActivityRequest
+    public class AddDefaultDataAppsLCUsRequest
     { }
 
-    public static class ToggleAddNewActivity
+    public static class AddDefaultDataAppsLCUs
     {
-        [FunctionName("ToggleAddNewActivity")]
+        [FunctionName("AddDefaultDataAppsLCUs")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            return await req.Manage<ToggleAddNewActivityRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
+            return await req.Manage<AddDefaultDataAppsLCUsRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
-                log.LogInformation($"Toggling Add New Activity.");
+                log.LogInformation($"Added Default Data Apps LCUs.");
 
-                return await mgr.ToggleAddNew(AddNewTypes.Activity);
+                return await mgr.AddDefaultDataAppsLCUs();
             });
         }
     }

@@ -33,6 +33,8 @@ namespace LCU.State.API.IDESettings
         {
             return await req.Manage<SetEditSectionRequest, IdeSettingsState, IDESettingsStateHarness>(log, async (mgr, reqData) =>
             {
+                log.LogInformation($"Setting Edit Section: {reqData.Section}");
+
                 return await mgr.SetEditSection(reqData.Section);
             });
         }
